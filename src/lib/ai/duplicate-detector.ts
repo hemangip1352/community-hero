@@ -9,6 +9,7 @@
  */
 
 import { DuplicateCheckResult } from '@/types';
+import { getFlashModel } from '@/lib/ai/gemini-client';
 
 const SIMILARITY_THRESHOLD = 0.7;
 const DISTANCE_THRESHOLD_KM = 0.5;
@@ -47,15 +48,58 @@ export async function checkForDuplicates(
           isRecent: isRecentEnough,
         };
       })
+      .filter(item => item.score >= 0.4) // Lower threshold to allow Gemini to catch semantic dupes
+      .sort((a, b) => b.score - a.score);
+
+    // Refine with Gemini semantic reasoning if available
+    const flash = getFlashModel();
+    if (flash && duplicates.length > 0) {
+      const candidates = duplicates.slice(0, 3);
+      const prompt = `You are a semantic deduplication engine. 
+NEW ISSUE:
+Title: ${title}
+Description: ${description}
+
+CANDIDATES:
+${candidates.map((c, i) => {
+  const issue = existingIssues.find(ex => ex.id === c.id);
+  return `[${i}] Title: ${issue?.title}\nDesc: ${issue?.description}\n`;
+}).join('\n')}
+
+For each candidate, score from 0.0 to 1.0 whether it is the EXACT SAME real-world civic issue as the NEW ISSUE. Focus on the core problem described, not just word overlap.
+
+Respond ONLY in JSON format:
+{
+  "scores": [number, ...] // Array of scores corresponding to the candidates
+}`;
+      try {
+        const result = await flash.generateContent(prompt);
+        const match = result.response.text().match(/\{[\s\S]*\}/);
+        if (match) {
+          const data = JSON.parse(match[0]);
+          if (Array.isArray(data.scores)) {
+            candidates.forEach((c, i) => {
+              if (typeof data.scores[i] === 'number') {
+                c.score = Math.max(c.score, data.scores[i]);
+              }
+            });
+          }
+        }
+      } catch (err) {
+        console.error('[AI] Gemini duplicate refinement failed:', err);
+      }
+    }
+
+    const finalDuplicates = duplicates
       .filter(item => item.score >= SIMILARITY_THRESHOLD || (item.isRecent && item.score >= 0.5))
       .sort((a, b) => b.score - a.score);
 
     return {
-      is_potential_duplicate: duplicates.length > 0,
-      duplicate_issue_ids: duplicates.map(d => d.id),
-      similarity_scores: duplicates.map(d => d.score),
-      reasoning: duplicates.length > 0
-        ? `Found ${duplicates.length} similar report(s) in the area with similarity scores: ${duplicates.map(d => d.score.toFixed(2)).join(', ')}`
+      is_potential_duplicate: finalDuplicates.length > 0,
+      duplicate_issue_ids: finalDuplicates.map(d => d.id),
+      similarity_scores: finalDuplicates.map(d => d.score),
+      reasoning: finalDuplicates.length > 0
+        ? `Found ${finalDuplicates.length} similar report(s) in the area with similarity scores: ${finalDuplicates.map(d => d.score.toFixed(2)).join(', ')}`
         : 'No duplicate reports found',
     };
   } catch (error) {

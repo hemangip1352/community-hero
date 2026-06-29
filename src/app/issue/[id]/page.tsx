@@ -44,6 +44,7 @@ interface Escalation {
 
 interface IssueFull {
   id: string;
+  user_id: string;
   title: string;
   description: string;
   category: string;

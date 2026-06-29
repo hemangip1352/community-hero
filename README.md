@@ -127,7 +127,7 @@ Every node writes ENTRY + EXIT logs to `agent_logs` — visible in real-time on 
 | Animations | Framer Motion |
 | Forms | React Hook Form + Zod |
 | State | Zustand |
-| Deployment | Vercel |
+| Deployment | Google AI Studio Starter Tier (Cloud Run) |
 
 ---
 
@@ -140,6 +140,12 @@ npm run start        # Start production server
 npm run typecheck    # TypeScript type check (tsc --noEmit)
 npm run lint         # ESLint
 ```
+
+---
+
+## 🚀 Deployment
+
+This application is deployed directly from Google AI Studio Build Mode using the **Publish** button to provision a Google Cloud Run service via the Starter Tier.
 
 ---
 

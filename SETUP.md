@@ -333,20 +333,9 @@ Located in `src/components/ui/`.
 
 ## 🚀 Deployment
 
-### Vercel Deployment
+### Google Cloud Run Deployment
 
-```bash
-# Connect GitHub repository
-vercel link
-
-# Set environment variables
-vercel env add NEXT_PUBLIC_SUPABASE_URL
-vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY
-# ... etc
-
-# Deploy
-vercel deploy
-```
+This application is deployed directly from Google AI Studio Build Mode using the **Publish** button to provision a Google Cloud Run service via the Starter Tier. Vercel is strictly not permitted for deployment in this project.
 
 ## ⚙️ Development Workflow
 

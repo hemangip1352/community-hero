@@ -12,7 +12,7 @@ export const reportIssueSchema = z.object({
     'Road Damage',
     'Other',
   ]),
-  urgency: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+  urgency: z.enum(['low', 'medium', 'high', 'critical']),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   image_base64: z.string().optional(),
@@ -54,7 +54,7 @@ export const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   full_name: z.string().optional(),
-  role: z.enum(['citizen', 'verifier', 'officer', 'senior_authority']).default('citizen'),
+  role: z.enum(['citizen', 'verifier', 'officer', 'senior_authority']),
 });
 
 export type ReportIssueInput = z.infer<typeof reportIssueSchema>;

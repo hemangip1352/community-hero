@@ -303,17 +303,8 @@ After submitting an issue:
 
 ---
 
-## Production Deployment (Vercel)
+## Production Deployment
 
-```bash
-# Install Vercel CLI
-npm i -g vercel
+This application is deployed directly from Google AI Studio Build Mode using the **Publish** button to provision a Google Cloud Run service via the Starter Tier.
 
-# Deploy
-vercel
-
-# Set environment variables in Vercel dashboard:
-# Settings → Environment Variables → Add each from .env.example
-```
-
-Or push to GitHub and connect the repo to Vercel for automatic deployments.
+Vercel is strictly not permitted for deployment in this project.

@@ -97,8 +97,7 @@ A complete, production-ready foundation for an **Autonomous Civic Resolution Pla
 - Recharts (analytics)
 - Google Maps (ready for integration)
 
-**Deployment:**
-- Vercel (production-ready)
+**Deployment:** Google AI Studio Starter Tier (Cloud Run) (production-ready)
 
 ### File Structure
 

@@ -175,5 +175,5 @@
 2. **Add Prettier**: `npm install prettier --save-dev` for consistent formatting
 3. **Upgrade RHF**: When React Hook Form v8 releases with Zod v4 support, update resolver types
 4. **Enable Supabase Realtime**: Subscribe to `agent_logs` for live dashboard updates
-5. **Rate limit API routes**: Add Vercel Edge rate limiting on `/api/issues` POST
-6. **Add CRON sweep**: Schedule `POST /api/agents/process` daily via Vercel Cron
+5. **Rate limit API routes**: Add Google Cloud Armor rate limiting on `/api/issues` POST
+6. **Add CRON sweep**: Schedule `POST /api/agents/process` daily via Google Cloud Scheduler

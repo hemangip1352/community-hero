@@ -154,6 +154,8 @@ export interface WorkflowState {
   issue: Issue;
   /** All nearby issues passed in for duplicate checking */
   nearby_issues: Array<Pick<Issue, 'id' | 'title' | 'description' | 'latitude' | 'longitude' | 'created_at'>>;
+  image_base64?: string;
+  mime_type?: string;
 
   // ── Per-node outputs ──────────────────────────────────────────────────────
   triage?: TriageResult;
@@ -390,7 +392,17 @@ Respond ONLY with valid JSON — no markdown, no commentary:
   "reasoning": "<sentences>"
 }`;
 
-        const result = await flash.generateContent(prompt);
+        const parts: any[] = [{ text: prompt }];
+        if (state.image_base64 && state.mime_type) {
+          parts.push({
+            inlineData: {
+              data: state.image_base64.replace(/^data:image\/\w+;base64,/, ''),
+              mimeType: state.mime_type
+            }
+          });
+        }
+
+        const result = await flash.generateContent(parts);
         const text = result.response.text();
         return extractJson(text);
       });
@@ -905,12 +917,16 @@ Mention the deadline and the consequence (escalation). Plain text only.`;
 export async function processIssueWorkflow(
   issue: Issue,
   nearbyIssues: Array<Pick<Issue, 'id' | 'title' | 'description' | 'latitude' | 'longitude' | 'created_at'>>,
+  image_base64?: string,
+  mime_type?: string,
 ): Promise<WorkflowState> {
   const globalStart = Date.now();
 
   const state: WorkflowState = {
     issue,
     nearby_issues: nearbyIssues,
+    image_base64,
+    mime_type,
     halt_as_duplicate: false,
     awaiting_community_verification: false,
     execution_logs: [],
@@ -960,6 +976,8 @@ export async function processIssueWorkflow(
 export async function processNewIssue(
   issue: Issue,
   existingIssues: Array<any>,
+  image_base64?: string,
+  mime_type?: string,
 ): Promise<WorkflowState> {
   const narrowed = (existingIssues as any[]).map((i) => ({
     id: i.id as string,
@@ -969,7 +987,7 @@ export async function processNewIssue(
     longitude: i.longitude as number,
     created_at: i.created_at as string,
   }));
-  return processIssueWorkflow(issue, narrowed);
+  return processIssueWorkflow(issue, narrowed, image_base64, mime_type);
 }
 
 // ─── Periodic productivity runner ─────────────────────────────────────────────

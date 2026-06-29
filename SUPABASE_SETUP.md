@@ -45,7 +45,7 @@ You should see: `Success. No rows returned`
 2. Set **Site URL**: `http://localhost:3000`
 3. Add to **Redirect URLs**:
    - `http://localhost:3000/auth/callback`
-   - `https://your-prod-domain.vercel.app/auth/callback` (for production)
+   - `https://your-cloud-run-url.run.app/auth/callback` (for production)
 
 ---
 
